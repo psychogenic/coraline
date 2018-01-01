@@ -1,0 +1,12 @@
+prefix=@CPACK_PACKAGE_INSTALL_DIRECTORY@
+exec_prefix=${prefix}
+includedir=${prefix}/include
+executable=${prefix}/bin/coraline
+homedir=${prefix}/share/coraline
+contentdir=${homedir}/content
+
+Name: coraline
+Description: @CPACK_PACKAGE_DESCRIPTION_SUMMARY@
+Requires: webkitgtk-3.0 gtk+-3.0
+Version: @CPACK_PACKAGE_VERSION@
+Cflags: -I${includedir}
