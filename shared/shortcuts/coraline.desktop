@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Coraline
+Exec=coraline default/index.html
+Terminal=false
+Type=Application
+X-Ubuntu-Touch=true
+Icon=/usr/local/share/coraline/content/default/assets/icon/coraline.png
