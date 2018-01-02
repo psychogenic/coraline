@@ -69,7 +69,7 @@ set(CPACK_PACKAGING_PREFIX ${CPACK_PACKAGE_INSTALL_DIRECTORY} CACHE STRING "Inst
 if (ENV{TRAVIS_TAG})
   set(CPACK_PACKAGE_VERSION $ENV{TRAVIS_TAG})
 else()
-  set(CPACK_PACKAGE_VERSION 1.0.7)
+  set(CPACK_PACKAGE_VERSION 1.0.8)
 endif()
 set(CPACK_PACKAGE_CONTACT "Pat Deegan, https://psychogenic.com")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Coraline, cordova-like native apps for Linux")
@@ -81,6 +81,7 @@ set(CPACK_PACKAGE_VENDOR "psychogenic.com")
 
 add_subdirectory(coraline)
 add_subdirectory(shared)
+add_subdirectory(plugins)
 
 
 # Generate pkg-config file

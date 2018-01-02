@@ -1,0 +1,3 @@
+[submodule "plugins/coraline-plugin-inappbrowser"]
+	path = plugins/coraline-plugin-inappbrowser
+	url = https://github.com/psychogenic/coraline-plugin-inappbrowser.git
