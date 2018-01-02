@@ -73,13 +73,13 @@ int main(int argc, char * argv[]) {
 
 	plugins_register_all(&myView);
 
+	plugins_start_all(&myView);
 
 
 	while (loopCount++ < (STARTUP_LOOPS/4)*3) {
 		webview_loop(&myView, 0);
 	}
 
-	plugins_start_all(&myView);
 
 	loopCount = 0;
 	while (loopCount++ < (STARTUP_LOOPS/4)) {
