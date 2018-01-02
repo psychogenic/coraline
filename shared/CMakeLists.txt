@@ -1,5 +1,5 @@
 #
-#  GattLib++ - GATT Library C++ Wrapper
+# Coraline shared resources
 #
 #  Copyright (C) 2017  Pat Deegan, https://psychogenic.com
 #

@@ -1,5 +1,5 @@
 #
-#  GattLib++ - GATT Library C++ Wrapper
+#  Coraline -- Cordova/Ionic app driver for Linux
 #
 #  Copyright (C) 2017  Pat Deegan, https://psychogenic.com
 #
