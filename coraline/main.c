@@ -32,7 +32,7 @@
 #include "coraline/corviewDefs.h"
 
 #include <unistd.h>
-#define STARTUP_LOOPS	30000
+#define STARTUP_LOOPS	3000
 
 #if defined(WEBVIEW_GTK)
 #define HAVE_PENDING_SYSUI_EVENTS()		gtk_events_pending()
@@ -64,30 +64,41 @@ int main(int argc, char * argv[]) {
 	.external_invoke_cb = dispatcher_webview_callback };
 
 
+	// in our global context
 	plugins_context_init(argc, argv, &myView);
-
+	// init our (possibly custom) icon
+	config_icon_init();
+	// init our webview
 	webview_init(&myView);
 
+	// give a few spins of iteration to allow for processing
+	while (loopCount++ < (STARTUP_LOOPS/100)) {
+		webview_loop(&myView, 0);
+	}
 
+	// show splan
 	startSplsh();
 
-	plugins_register_all(&myView);
-
-	plugins_start_all(&myView);
-
-
-	while (loopCount++ < (STARTUP_LOOPS/4)*3) {
-		webview_loop(&myView, 0);
-	}
-
-
 	loopCount = 0;
-	while (loopCount++ < (STARTUP_LOOPS/4)) {
+	plugins_register_all(&myView);
+	// give a few spins of iteration to allow for processing
+	while (loopCount++ < (STARTUP_LOOPS/100)) {
 		webview_loop(&myView, 0);
 	}
 
+	// actually start the plugins
+	plugins_start_all(&myView);
+	loopCount = 0;
+	// give the webview ample time to process the 
+	// JS etc 
+	while (loopCount++ < (STARTUP_LOOPS)) {
+		webview_loop(&myView, 0);
+	}
+
+	// now call it "device ready"
 	plugins_deviceready_signal();
 
+	// and do our main loop
 	do {
 		loopCount = 0;
 		plugins_update_all();
@@ -98,6 +109,7 @@ int main(int argc, char * argv[]) {
 			webview_loop(&myView, 0); // non-blocking handle
 			plugins_update_all();
 		}
+		webview_loop(&myView, 0); // non-blocking handle
 
 		// all of this batch of events handled, blocking
 		// so now we want to periodically update our plugins

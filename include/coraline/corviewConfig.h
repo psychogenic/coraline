@@ -27,7 +27,7 @@
 
 
 
-//define CORVIEWDEBUG
+//#define CORVIEWDEBUG
 
 #define APPLICATION_NAME		"com.psychogenic.coraline"
 

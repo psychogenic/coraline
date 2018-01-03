@@ -69,8 +69,9 @@ static GtkWidget * dwinForImg(GtkWidget * image) {
 	gtk_window_set_position(GTK_WINDOW(dialog_window),GTK_WIN_POS_CENTER_ALWAYS);
 
 	gtk_window_set_type_hint(GTK_WINDOW(dialog_window), GDK_WINDOW_TYPE_HINT_SPLASHSCREEN);
+	gtk_window_set_opacity(GTK_WINDOW(dialog_window), 0.5);
+	// gtk_window_set_opacity(GTK_WINDOW(image), 0.5);
 
-    // gtk_widget_set_size_request(dialog_window, 400, 200);
 
 	gtk_container_add(GTK_CONTAINER(dialog_window), image);
 
@@ -154,11 +155,11 @@ void startSplsh() {
 			&& config->splash().size()) {
 
 		CVDEBUG_OUT("Have a custom splash...");
-		g_timeout_add(1000, close_screen_showsplash, dialog_window);
+		g_timeout_add(1200, close_screen_showsplash, dialog_window);
 
 	} else {
 		CVDEBUG_OUT("No custom splash...");
-		g_timeout_add(2200, close_screen_simple, dialog_window);
+		g_timeout_add(2000, close_screen_simple, dialog_window);
 	}
 
 }

@@ -32,6 +32,8 @@
 extern "C" {
 #endif
 
+void config_icon_init();
+
 void plugins_context_init(int argc, char* argv[], struct webview *w);
 
 void plugins_register_all(struct webview *w);

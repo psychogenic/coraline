@@ -41,8 +41,6 @@
 
 void plugins_context_init(int argc, char* argv[], struct webview *w) {
 
-	bool iconSet = false;
-	static std::string iconImg;
 	Coraline::Plugin::ContextFactory::setStartupArgs(argc, argv);
 	Coraline::Plugin::ContextFactory::setView(w);
 	Coraline::Configuration* config = Coraline::Configuration::getInstance();
@@ -51,14 +49,22 @@ void plugins_context_init(int argc, char* argv[], struct webview *w) {
 		Coraline::Plugin::ContextFactory::refreshConfig();
 
 	}
+}
 
-
+void config_icon_init() {
+	static std::string iconImg;
+	bool iconSet = false;
+	GError * err = NULL;
+	Coraline::Configuration* config = Coraline::Configuration::getInstance();
 	if (config->hadConfigFile() && config->icon().size()) {
+		CVDEBUG_OUT("Have icon in config: " << config->icon());
 		iconImg = config->fullPathForContent(config->icon());
 		if (fileExists(iconImg)) {
+			CVDEBUG_OUTLN(" and file EXISTS. setting.");
 			iconSet = true;
-			gtk_window_set_default_icon_from_file(iconImg.c_str(), NULL);
 
+		} else {
+			CVDEBUG_OUTLN(" but file DNE");
 		}
 
 	}
@@ -66,9 +72,14 @@ void plugins_context_init(int argc, char* argv[], struct webview *w) {
 	if (! iconSet) {
 		iconImg = CORALINE_SYSTEM_RESOURCES;
 		iconImg += CORVIEW_PATH_SEP + std::string("icon.png");
-		gtk_window_set_default_icon_from_file(iconImg.c_str(), NULL);
+		CVDEBUG_OUTLN("Using default icon.");
 	}
 
+	gtk_window_set_default_icon_from_file(iconImg.c_str(), &err);
+	if (Coraline::Plugin::ContextFactory::get().topWindow) {
+	gtk_window_set_icon_from_file(GTK_WINDOW(Coraline::Plugin::ContextFactory::get().topWindow), 
+					iconImg.c_str(), &err);
+	}
 	Coraline::Plugin::ContextFactory::setIcon(iconImg.c_str());
 }
 
