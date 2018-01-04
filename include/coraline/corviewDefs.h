@@ -43,6 +43,7 @@
 #define CORVIEW_PACKEDSTRUCT struct __attribute__ ((__packed__))
 
 #define CORVIEW_PATH_SEP			"/"
+#define CORVIEW_DEFAULT_TOPFILE		"index.html"
 
 
 #endif /* INCLUDES_WEBVIEW_CORVIEWDEFS_H_ */

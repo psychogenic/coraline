@@ -170,7 +170,8 @@ const char * rootFile(int argc, char * argv[]) {
 	static char fname[1024] = {0,};
 	static bool is_ready = false;
 	bool need_basedir_prefix = false;
-	std::string bdir;
+	std::string bdir = CONTENT_INSTALL_DIR;
+	std::string topFile;
 
 	CVDEBUG_OUT("figuring out rootFile...");
 	if (is_ready) {
@@ -184,17 +185,38 @@ const char * rootFile(int argc, char * argv[]) {
 
 	is_ready = true;
 
-	if (argc > 1) {
+	if (argc > 1 && argv[1]) {
 		CVDEBUG_OUT("have an arg...");
+
+		topFile = argv[1];
 		if (argv[1][0] != '/') {
 			CVDEBUG_OUT("need content dir");
 			need_basedir_prefix = true;
 		}
 	} else {
 
-		CVDEBUG_OUT("using default topfile");
-		std::string topF(DEFAULT_TOPFILE);
-		if (topF[0] != '/') {
+		// no argument...
+		// attempt to auto-select based on calling name
+		std::string defTopFile(CORVIEW_DEFAULT_TOPFILE);
+		if (argv[0]) {
+			topFile = argv[0];
+
+			// get rid of any prefix /path/to/bla/NAME and keep only name
+			std::string::size_type lastSlash = topFile.find_last_of(CORVIEW_PATH_SEP);
+			if (lastSlash != std::string::npos) {
+				// have some slashes in there
+				topFile = topFile.substr(lastSlash + 1, topFile.size() - lastSlash);
+			}
+
+			topFile += CORVIEW_PATH_SEP + defTopFile;
+		}
+
+		if (! (topFile.size() && fileExists(bdir + CORVIEW_PATH_SEP + topFile))) {
+			CVDEBUG_OUT("using default topfile");
+			topFile = DEFAULT_TOPFILE;
+		}
+
+		if (topFile[0] != '/') {
 			need_basedir_prefix = true;
 		}
 
@@ -202,7 +224,6 @@ const char * rootFile(int argc, char * argv[]) {
 
 	if (need_basedir_prefix) {
 
-		bdir = CONTENT_INSTALL_DIR;
 		if (bdir.size()){
 			strncat(fname, bdir.c_str(), 500);
 			strncat(fname, CORVIEW_PATH_SEP, 1);
@@ -213,12 +234,8 @@ const char * rootFile(int argc, char * argv[]) {
 	}
 
 
+	strncat(fname, topFile.c_str(), 500);
 
-	if (argc > 1) {
-		strncat(fname, argv[1], 500);
-	} else {
-		strncat(fname, DEFAULT_TOPFILE, 500);
-	}
 #endif
 
 	CVDEBUG_OUTLN("returning fname:" << fname);
