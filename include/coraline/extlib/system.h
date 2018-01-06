@@ -25,8 +25,15 @@
 #ifndef INCLUDES_EXTLIB_SYSTEM_H_
 #define INCLUDES_EXTLIB_SYSTEM_H_
 
+
 #include <inttypes.h>
 #include <stdint.h>
+
+#include <sys/types.h>
+#include <dirent.h>
+#include <errno.h>
+#include <sys/stat.h>
+
 #include <dlfcn.h>
 
 

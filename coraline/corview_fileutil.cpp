@@ -22,7 +22,7 @@
  *
  */
 
-
+#include "coraline/extlib/system.h"
 #include "coraline/webview/corview_fileutil.h"
 
 #include "coraline/corviewConfig.h"
@@ -34,18 +34,7 @@
 #include "../include/coraline/coralineDirs.h"
 #include "coraline/coralineLocations.h"
 #include "coraline/webview/coraline.h"
-
-#include <sys/types.h>
-#include <dirent.h>
-#include <errno.h>
-// #include <libgen.h> -- dirname duh
-
-
-#include <gtk/gtk.h>
-#include <gtk/gtkwindow.h>
-#include <gdk/gdkpixbuf.h>
-
-#include <sys/stat.h>
+#include "coraline/webview/window_utils.h"
 
 
 bool fileExists(const std::string & fullpath) {
@@ -60,7 +49,7 @@ int fileExists(const char * fullpath) {
 
 }
 
-
+#if 0
 
 static GtkWidget * dwinForImg(GtkWidget * image) {
 
@@ -107,29 +96,27 @@ static gboolean showUserSplashScreen(const std::string & imgPath) {
 
 
 }
-
+#endif
 
 gboolean close_screen_showsplash(gpointer data)
 {
+
 	gtk_widget_destroy((GtkWidget*)data);
 	Coraline::Configuration * config = Coraline::Configuration::getInstance();
 
 	CVDEBUG_OUT("showsplash close screen 1...");
 	if (config->hadConfigFile() && config->splash().size()) {
-		std::string fullPath(config->contentDir() + CORVIEW_PATH_SEP );
-		fullPath += config->splash();
-
-
+		std::string fullPath = config->fullPathForContent(config->splash());
 		CVDEBUG_OUT("Checking for " << fullPath);
 
 		if (fileExists(fullPath))
 		{
-
-			showUserSplashScreen(fullPath);
+			Coraline::UI::showImageWindowForFile(fullPath, 1600);
 		}
 	}
 
 	return (0);
+
 }
 
 
@@ -137,29 +124,23 @@ void startSplsh() {
 
 	GtkWidget *dialog_window, *image;
 	Coraline::Configuration* config = Coraline::Configuration::getInstance();
-
-
 	coraline_register_resource();
 	GResource * res = coraline_get_resource();
-
-
 
 	image = gtk_image_new_from_resource(
 			"/com/psychogenic/coraline/icon/splash.png");
 
-	dialog_window = dwinForImg(image);
-
-	gtk_widget_show_all(dialog_window);
-
+	dialog_window = Coraline::UI::windowForImage(image, 0.5);
 	if (config->hadConfigFile()
 			&& config->splash().size()) {
 
 		CVDEBUG_OUT("Have a custom splash...");
+		Coraline::UI::showWindow(dialog_window, CORALINE_IMAGEWINDOW_NOTIMEOUT); // we'll handle the timeout
 		g_timeout_add(1200, close_screen_showsplash, dialog_window);
 
 	} else {
 		CVDEBUG_OUT("No custom splash...");
-		g_timeout_add(2000, close_screen_simple, dialog_window);
+		Coraline::UI::showWindow(dialog_window, 1800); // auto timeout
 	}
 
 }
@@ -245,6 +226,7 @@ const char * rootFile(int argc, char * argv[]) {
 
 
 
+#define GETDIR_TOTALFILES_MAX	250
 /*function... might want it in some class?*/
 int getdir (std::string dir, FilesInDirList &files, std::string prefix, int maxnum)
 {
@@ -255,7 +237,7 @@ int getdir (std::string dir, FilesInDirList &files, std::string prefix, int maxn
 
     if (maxnum < 1) {
     	numRead = 0;
-    	maxnum = 200;
+    	maxnum = GETDIR_TOTALFILES_MAX;
     }
 
     if((dp  = opendir(dir.c_str())) == NULL) {
