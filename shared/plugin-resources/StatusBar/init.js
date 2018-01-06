@@ -1,0 +1,1 @@
+(function(){function a(a,b){setTimeout(function(){a&&a()},0)}function b(){}b.prototype={isVisible:!1,styleBlackTranslucent:a,styleDefault:a,styleLightContent:a,styleBlackOpaque:a,overlaysWebView:a,styleLightContect:a,backgroundColorByName:a,backgroundColorByHexString:a,hide:a,show:a,_ready:a};this.StatusBar=new b}).call(this);
