@@ -32,7 +32,7 @@
 #include "coraline/corviewDefs.h"
 
 #include <unistd.h>
-#define STARTUP_LOOPS	3000
+#define STARTUP_LOOPS	5000
 
 #if defined(WEBVIEW_GTK)
 #define HAVE_PENDING_SYSUI_EVENTS()		gtk_events_pending()
@@ -43,12 +43,31 @@
 #include <gtk/gtk.h>
 #include <gtk/gtkwindow.h>
 
+static void processPendingEvents(struct webview * wv, int maxCount) {
+	int loopCount = 0;
+	int noEventsCount = 0;
+	int maxNoEventsCount = maxCount / 10;
+	webview_loop(wv, 0);
+	// spare 20 ms to let the system queue anything it needs to
+	usleep(20000);
+
+	while (noEventsCount < maxNoEventsCount && (loopCount++ < maxCount)) {
+		if (HAVE_PENDING_SYSUI_EVENTS()) {
+			webview_loop(wv, 1);
+		} else {
+			noEventsCount++;
+			usleep(15);
+		}
+	}
+
+}
 
 int main(int argc, char * argv[]) {
 
 	char urlfile[1024] = {0,};
 	const char * fname = rootFile(argc, argv);
 	int loopCount = 0;
+	int noEventsCount = 0;
 
 	strcpy(urlfile, "file://");
 	strncat(urlfile, fname, 1000);
@@ -71,29 +90,30 @@ int main(int argc, char * argv[]) {
 	// init our webview
 	webview_init(&myView);
 
-	// give a few spins of iteration to allow for processing
-	while (loopCount++ < (STARTUP_LOOPS/100)) {
-		webview_loop(&myView, 0);
-	}
-
 	// show splan
 	startSplsh();
 
-	loopCount = 0;
+	processPendingEvents(&myView, STARTUP_LOOPS/100);
+
+
 	plugins_register_all(&myView);
+
+	processPendingEvents(&myView, STARTUP_LOOPS/100);
+/*
+	webview_loop(&myView, 0);
+	usleep(2000);
 	// give a few spins of iteration to allow for processing
-	while (loopCount++ < (STARTUP_LOOPS/100)) {
+	while (HAVE_PENDING_SYSUI_EVENTS() && (loopCount++ < (STARTUP_LOOPS/100))) {
 		webview_loop(&myView, 0);
 	}
 
+	*/
 	// actually start the plugins
 	plugins_start_all(&myView);
-	loopCount = 0;
+
 	// give the webview ample time to process the 
 	// JS etc 
-	while (loopCount++ < (STARTUP_LOOPS)) {
-		webview_loop(&myView, 0);
-	}
+	processPendingEvents(&myView, STARTUP_LOOPS);
 
 	// now call it "device ready"
 	plugins_deviceready_signal();
@@ -101,12 +121,17 @@ int main(int argc, char * argv[]) {
 	// and do our main loop
 	do {
 		loopCount = 0;
-		plugins_update_all();
+		noEventsCount = 0;
 		// handle all events pending, now
-		while (HAVE_PENDING_SYSUI_EVENTS() && loopCount++ < 1000) {
+		while (noEventsCount < 10 && loopCount++ < 1000) {
 
-			plugins_update_all();
-			webview_loop(&myView, 0); // non-blocking handle
+			if (HAVE_PENDING_SYSUI_EVENTS()) {
+				webview_loop(&myView, 1);
+			} else {
+				noEventsCount ++;
+				webview_loop(&myView, 0); 
+			}
+
 			plugins_update_all();
 		}
 		webview_loop(&myView, 0); // non-blocking handle
@@ -115,7 +140,6 @@ int main(int argc, char * argv[]) {
 		// so now we want to periodically update our plugins
 		plugins_update_all();
 		usleep(CORVIEW_MAINLOOP_SLEEPUS);
-		// usleep(5000);
 
 	} while (webview_loop(&myView, 0) == 0);
 
