@@ -179,6 +179,12 @@ std::string Base::callbackTriggerString(const std::string & method,
 }
 
 void Base::triggerCallback(CallbackID cbid) {
+
+	if (!cbid) {
+		CVDEBUG_OUTLN("No id set, skipping trigger");
+		return;
+	}
+
 	std::string cmdStr(callbackTriggerString("triggerCallback", cbid));
 	CVDEBUG_OUTLN("Triggering callback with eval:" << cmdStr);
 	struct webview * wView = (struct webview *)theView;
@@ -186,9 +192,13 @@ void Base::triggerCallback(CallbackID cbid) {
 }
 void Base::triggerCallbackNoRemove(CallbackID cbid) {
 
+	if (!cbid) {
+		CVDEBUG_OUTLN("No id set, skipping triggerNoRemove");
+		return;
+	}
+
 	std::string cmdStr(callbackTriggerString("triggerCallbackNoRemove", cbid));
 	CVDEBUG_OUTLN("Triggering callback with eval:" << cmdStr);
-
 	struct webview * wView = (struct webview *)theView;
 	webview_eval(wView, cmdStr.c_str());
 
