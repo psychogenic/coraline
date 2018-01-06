@@ -30,6 +30,8 @@ set(coraline_SRCS main.c
 	plugins_setup.cpp
 	Configuration.cpp
 	builtin/NativeBridge.cpp
+	builtin/SplashScreen.cpp
+	builtin/StatusBar.cpp
 	builtin/TestPlugin.cpp
 	plugin/Registry.cpp
 	plugin/Dispatcher.cpp
@@ -39,6 +41,7 @@ set(coraline_SRCS main.c
 	corview_fileutil.cpp
 	webview/coraline.c 
 	webview/webview_callback.cpp
+	webview/window_utils.cpp
 )
 
 set(coraline_LIBS ${GTK_LDFLAGS} ${WEBKITGTK_LDFLAGS} ${GLIB_LDFLAGS})

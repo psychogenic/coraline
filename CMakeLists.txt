@@ -69,7 +69,7 @@ set(CPACK_PACKAGING_PREFIX ${CPACK_PACKAGE_INSTALL_DIRECTORY} CACHE STRING "Inst
 if (ENV{TRAVIS_TAG})
   set(CPACK_PACKAGE_VERSION $ENV{TRAVIS_TAG})
 else()
-  set(CPACK_PACKAGE_VERSION 1.0.12)
+  set(CPACK_PACKAGE_VERSION 1.0.14)
 endif()
 set(CPACK_PACKAGE_CONTACT "Pat Deegan, https://psychogenic.com")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Coraline, cordova-like native apps for Linux")
@@ -114,10 +114,13 @@ if (NOT CMAKE_SYSROOT)
   execute_process(COMMAND dpkg --print-architecture OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE OUTPUT_QUIET)
 endif()
 
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.26), libgtk-3-0  (>= 3.22.25), libwebkitgtk-3.0-0 (>= 2.4.11), libglib2.0-0 (>= 2.54.1)")
+
+# TODO:FIXME -- don't know what to put in here... set(CPACK_RPM_PACKAGE_REQUIRES "???")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libgtk-3-0  (>= 3.22.25), libwebkitgtk-3.0-0 (>= 2.4.11), libglib2.0-0 (>= 2.54.1)")
 #
 # List of file to install
 #
+
 
 #install(FILES include/Coraline.h DESTINATION include)
 #install(FILES ${PROJECT_BINARY_DIR}/gattlibpp.pc DESTINATION lib/pkgconfig)

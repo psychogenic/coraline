@@ -33,6 +33,8 @@
 
 #include "coraline/builtin/TestPlugin.h"
 #include "coraline/builtin/NativeBridge.h"
+#include "coraline/builtin/SplashScreen.h"
+#include "coraline/builtin/StatusBar.h"
 #include "coraline/Configuration.h"
 
 
@@ -211,15 +213,20 @@ static Coraline::Plugin::PluginList plugins_load_dynamic() {
 
 static void plugins_load_builtin(const Coraline::Plugin::Context & ctx) {
 	CVDEBUG_OUTLN("loading built-in plugins");
-	Coraline::Plugin::NativeBridge * nativeBrg = new Coraline::Plugin::NativeBridge(ctx);
-	nativeBrg->initAndRegister();
-	nativeBrg->injectCode();
+	Coraline::Plugin::Base * builtins[] = {
+			new Coraline::Plugin::NativeBridge(ctx),
+			new Coraline::Plugin::SplashScreen(ctx),
+			new Coraline::Plugin::StatusBar(ctx),
+			new Coraline::Plugin::TestPlugin(ctx),
+			NULL
+	};
 
-
-
-	Coraline::Plugin::TestPlugin * tPlugin = new Coraline::Plugin::TestPlugin(ctx);
-	tPlugin->initAndRegister();
-	tPlugin->injectCode();
+	uint8_t i=0;
+	while (builtins[i]) {
+		builtins[i]->initAndRegister();
+		builtins[i]->injectCode();
+		i++;
+	}
 
 }
 
@@ -317,6 +324,8 @@ void plugins_deviceready_signal() {
 
 	if (nb) {
 		nb->notifyDeviceReady();
+	} else {
+		CVERROR_OUTLN("no nativebridge pluding " << CORVIEW_NATIVEBRIDGE_PLUGINNAME << " found ?");
 	}
 }
 void plugins_update_all() {
